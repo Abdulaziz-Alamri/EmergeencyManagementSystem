@@ -34,18 +34,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
             header('Location: register.php');
             exit;
         } else {
-            $phoneNumberString = implode(',', $phoneNumbers);
             $fullName = $fname . ' ' . $mname . ' ' . $lname;
 
             $query1 = "INSERT INTO person(ID, fname, mname, lname, Birth_date, Address_, Person_Role, Profession_Name, College)
             VALUES ('$ID', '$fname', '$mname', '$lname', '$birthDate', '$address', '$personRole', '$professionName', '$college')";
             $query2 = "INSERT INTO userprofile(username, Password,Person_ID, Full_Name, numberOfReports) 
             VALUES ('$username','$hashedPassword','$ID','$fullName',0)";
-            $query3 = "INSERT INTO person_phone_number(Person_ID, Phone_Number) VALUES ('$ID', '$phoneNumberString')";
-
+            $query3 = '';
+            foreach ($phoneNumbers as $phone_num) {
+                $query3 .= "INSERT INTO person_phone_number(Person_ID, Phone_Number) VALUES ('$ID', '$phone_num');";
+            }
             $result1 = mysqli_query($conn, $query1);
             $result2 = mysqli_query($conn, $query2);
-            $result3 = mysqli_query($conn, $query3);
+            $result3 = mysqli_multi_query($conn, $query3);
         }
     }
     $_SESSION['username'] = $username;
